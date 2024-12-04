@@ -2,7 +2,7 @@ import styles from './CreatePost.module.css'
 import { useState }from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthValue } from '../../context/AuthContext.js';
-
+import { useInsertDocument } from '../../hooks/useInsertDocument.js'
 
 const CreatePost = () => {
   const [title, setTitle] = useState("");
@@ -10,15 +10,45 @@ const CreatePost = () => {
   const [body, setBody] = useState("");
   const [tags, setTags] = useState([]);
   const [formError, setFormError] = useState("");
+  
+  const { insertDocument, response } = useInsertDocument("posts");
+
+  const navigate = useNavigate();
+
+  const { user } = useAuthValue();
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setFormError("");
 
     //URL imagem
+    try {
+      new URL(image)
+    } catch (error) {
+      setFormError("A imagem precisa ser uma URL");
+    }
+    //criar o array de tags
+    const tagsArray = tags.split(",").map((tag) => tag.trim().toLowerCase())
 
+    //checar todoso os valore
+    if(!title || !image || !tags || !body){
+    setFormError("Por favor, preencha todos os campos!")
+    }
+
+    if(formError) return;
+    
     //criar o post
+    insertDocument({
+      title,
+      image,
+      body,
+      tagsArray,
+      uid: user.uid,
+      createBy: user.displayName
+    });
 
+    // redirect home page
+    navigate("/");
   };
 
   return (
@@ -65,10 +95,10 @@ const CreatePost = () => {
           value={tags}
           />
         </label>
-        <button className='btn' >Cadastrar</button>
-        {/* {!loading && <button className='btn' >Cadastrar</button>}
-        {loading && <button className='btn' disabled >Aguarde...</button>}
-        {error && <p className='error'>{error}</p>} */}
+        {!response.loading && <button className='btn' >Cadastrar</button>}
+        {response.loading && <button className='btn' disabled >Aguarde...</button>}
+        {response.error && <p className='error'>{response.error}</p>}
+        {formError && <p className='error'>{formError}</p>}
       </form>
     </div>
   )
