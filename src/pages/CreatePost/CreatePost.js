@@ -42,9 +42,9 @@ const CreatePost = () => {
       title,
       image,
       body,
-      tagsArray,
+      tags: tagsArray,
       uid: user.uid,
-      createBy: user.displayName
+      createdBy: user.displayName
     });
 
     // redirect home page
