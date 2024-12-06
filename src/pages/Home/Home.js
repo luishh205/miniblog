@@ -8,7 +8,7 @@ import { useFetchDocuments } from "../../hooks/useFetchDocumento.js";
 import PostDetail from '../../components/PostDetail.js';
 
 const Home = () => {
-  const [query, setquery] = useState();
+  const [query, setquery] = useState("");
   const {documents: posts, loading, error} = useFetchDocuments("posts");
 
   const navigate = useNavigate();
