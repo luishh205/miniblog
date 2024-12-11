@@ -2,14 +2,14 @@ import styles from './EditPost.module.css'
 import { useEffect, useState }from 'react';
 import { useNavigate,useParams } from 'react-router-dom';
 import { useAuthValue } from '../../context/AuthContext.js';
-import { useInsertDocument } from '../../hooks/useInsertDocument.js'
+import { useUpdateDocument } from '../../hooks/useUpdateDocument.js';
 import { useFetchDocumentId } from '../../hooks/useFechDocumentId.js';
 
 const EditPost = () => {
 
   const {id} = useParams()
 
-  const {document:post}= useFetchDocumentId("posts",id)
+  const { document:post } = useFetchDocumentId("posts",id)
 
   const [title, setTitle] = useState("");
   const [image, setImage] = useState("");
@@ -28,7 +28,7 @@ const EditPost = () => {
     }
   },[post])
   
-  const { insertDocument, response } = useInsertDocument("posts");
+  const { updateDocument, response } = useUpdateDocument("posts");
 
   const navigate = useNavigate();
 
@@ -54,18 +54,19 @@ const EditPost = () => {
 
     if(formError) return;
     
-    //criar o post
-    insertDocument({
+    const data = {
       title,
       image,
       body,
       tags: tagsArray,
       uid: user.uid,
       createdBy: user.displayName
-    });
+    }
+
+    updateDocument(id, data);
 
     // redirect home page
-    navigate("/");
+    navigate("/dashboard");
   };
 
   return (
@@ -116,7 +117,7 @@ const EditPost = () => {
                         value={tags}
                         />
                       </label>
-                      {!response.loading && <button className='btn' >Cadastrar</button>}
+                      {!response.loading && <button className='btn' >Editar</button>}
                       {response.loading && <button className='btn' disabled >Aguarde...</button>}
                       {response.error && <p className='error'>{response.error}</p>}
                       {formError && <p className='error'>{formError}</p>}
